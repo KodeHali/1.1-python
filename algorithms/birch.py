@@ -6,7 +6,6 @@ from sklearn.cluster import Birch
 from sklearn.preprocessing import StandardScaler
 
 def birch_clustering(image_path, result_folder, n_clusters=5, threshold=0.5, branching_factor=50, max_dimension=500):
-    # Load the image
     image = cv2.imread(image_path)
     if image is None:
         print(f"Error: Could not read image at {image_path}")
