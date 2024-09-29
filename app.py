@@ -4,6 +4,10 @@ from werkzeug.utils import secure_filename
 from algorithms.kmeans import kmeans_clustering
 from algorithms.meanshift import meanshift_clustering
 from algorithms.dbscan import dbscan_clustering
+from algorithms.birch import birch_clustering  # Import the BIRCH clustering function
+from algorithms.ward import ward_clustering  # Import the Ward's method clustering function
+
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'  # Folder for uploaded images
@@ -72,11 +76,20 @@ def results():
 
     # Apply the chosen algorithm
     if algorithm == 'kmeans':
+        print("Running K-MEANS...")
         result_image_path = kmeans_clustering(image_path, app.config['RESULT_FOLDER'], K=3)
     elif algorithm == 'meanshift':
+        print("Running MEANSHIFT...")
         result_image_path = meanshift_clustering(image_path, app.config['RESULT_FOLDER'])
     elif algorithm == 'dbscan':
+        print("Running DBSCAN...")
         result_image_path = dbscan_clustering(image_path, app.config['RESULT_FOLDER'])
+    elif algorithm == 'birch':
+        print("Running BIRCH...")
+        result_image_path = birch_clustering(image_path, app.config['RESULT_FOLDER'])
+    elif algorithm == 'ward':
+        print("Running WARD...")
+        result_image_path = ward_clustering(image_path, app.config['RESULT_FOLDER'])
     else:
         flash('Invalid algorithm selected')
         return redirect(url_for('algorithm_selection', filename=filename))
