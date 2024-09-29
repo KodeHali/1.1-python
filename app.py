@@ -3,6 +3,7 @@ from flask import Flask, request, redirect, url_for, render_template, flash
 from werkzeug.utils import secure_filename
 from algorithms.kmeans import kmeans_clustering
 from algorithms.meanshift import meanshift_clustering
+from algorithms.dbscan import dbscan_clustering
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'  # Folder for uploaded images
@@ -74,6 +75,8 @@ def results():
         result_image_path = kmeans_clustering(image_path, app.config['RESULT_FOLDER'], K=3)
     elif algorithm == 'meanshift':
         result_image_path = meanshift_clustering(image_path, app.config['RESULT_FOLDER'])
+    elif algorithm == 'dbscan':
+        result_image_path = dbscan_clustering(image_path, app.config['RESULT_FOLDER'])
     else:
         flash('Invalid algorithm selected')
         return redirect(url_for('algorithm_selection', filename=filename))
