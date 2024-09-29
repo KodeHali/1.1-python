@@ -7,20 +7,28 @@ from sklearn.cluster import MeanShift
 def meanshift_clustering(image_path, result_folder):
     # Load the image
     image = cv2.imread(image_path)
+    if image is None:
+        print(f"Error: Could not read image at {image_path}")
+        return None
+
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # Resize the image to make Mean Shift more efficient
-    scale_percent = 50  # Reduce image size to 50% of the original
-    width = int(image.shape[1] * scale_percent / 100)
-    height = int(image.shape[0] * scale_percent / 100)
-    dim = (width, height)
-    resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+    max_dimension = 250  # Set the maximum dimension size
+    height, width = image.shape[:2]
+    if max(height, width) > max_dimension:
+        scaling_factor = max_dimension / float(max(height, width))
+        new_size = (int(width * scaling_factor), int(height * scaling_factor))
+        resized_image = cv2.resize(image, new_size, interpolation=cv2.INTER_AREA)
+    else:
+        resized_image = image
 
     # Reshape the image to a 2D array of pixels
     pixel_values = resized_image.reshape((-1, 3))
 
     # Apply Mean Shift Clustering
     meanshift = MeanShift(bin_seeding=True)
+    print("Applying Mean Shift clustering...")
     meanshift.fit(pixel_values)
 
     # Extract labels and unique centers (colors)
@@ -34,7 +42,7 @@ def meanshift_clustering(image_path, result_folder):
     segmented_image = centers[labels.flatten()]
     segmented_image = segmented_image.reshape(resized_image.shape)
 
-    # Save the segmented image in the static/uploads/ folder
+    # Save the segmented image
     result_image_path = os.path.join(result_folder, 'result_meanshift_' + os.path.basename(image_path))
     plt.imsave(result_image_path, segmented_image)
 

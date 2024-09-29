@@ -58,7 +58,7 @@ def algorithm_selection():
     return render_template('algorithm_selection.html', filename=filename)
 
 
-@app.route('/results')
+@app.route('/results', methods=['GET', 'POST'])
 def results():
     filename = request.args.get('filename')
     algorithm = request.args.get('algorithm')
