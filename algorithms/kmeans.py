@@ -2,31 +2,34 @@ import cv2
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
 
-def kmeans_clustering(image_path, result_folder, K=3):
-    # Load the image
-    image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+def kmeans_clustering(feature_vector, original_shape, scaler, result_folder, use_pca=False, K=5):
 
-    # Reshape the image to a 2D array of pixels
-    pixel_values = image.reshape((-1, 3))
-    pixel_values = np.float32(pixel_values)
+    # Apply K-Means Clustering
+    print("Applying K-Means clustering...")
+    kmeans = KMeans(n_clusters=K, random_state=42)
+    labels = kmeans.fit_predict(feature_vector)
+    centers = kmeans.cluster_centers_
 
-    # K-Means parameters
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
-    
-    # Apply K-Means clustering
-    _, labels, centers = cv2.kmeans(pixel_values, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    # Reconstruct the segmented image
+    if use_pca:
+        # Since PCA was applied, we cannot inverse transform using scaler
+        # Assign colors based on cluster labels or use the inverse PCA transform if possible
+        segmented_image = centers[labels]
+        # Optionally, you can attempt to inverse transform using PCA if you've stored it
+        # For simplicity, we'll map each cluster to its center's color components
+        segmented_image = (segmented_image * 255).astype(np.uint8)
+    else:
+        # Inverse transform to get back to original feature space
+        segmented_image = scaler.inverse_transform(centers)[labels][:, :3]
+        segmented_image = (segmented_image * 255).astype(np.uint8)
 
-    # Convert centers back to 8-bit values
-    centers = np.uint8(centers)
+    segmented_image = segmented_image.reshape(original_shape)
 
-    # Map labels to center colors
-    segmented_image = centers[labels.flatten()]
-    segmented_image = segmented_image.reshape(image.shape)
-
-    # Save the segmented image in the result folder
-    result_image_path = os.path.join(result_folder, 'result_kmeans_' + os.path.basename(image_path))
+    # Save the result
+    result_image_path = os.path.join(result_folder, 'result_kmeans.png')
     plt.imsave(result_image_path, segmented_image)
 
     return result_image_path
