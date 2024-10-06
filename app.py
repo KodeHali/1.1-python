@@ -114,29 +114,35 @@ def results():
 
     if algorithm == 'kmeans':
         result_image_path = kmeans_clustering(
-        feature_vector_transformed, original_shape, scaler, result_folder, use_pca=use_pca, K=5)
+            feature_vector_transformed, original_shape, scaler, result_folder, use_pca=use_pca, K=5
+        )
     elif algorithm == 'meanshift':
-        result_image_path = meanshift_clustering(feature_vector, original_shape)
+        result_image_path = meanshift_clustering(
+        feature_vector_transformed, original_shape, scaler, result_folder, use_pca=use_pca, pca=pca
+    )
     elif algorithm == 'dbscan':
-        result_image_path = dbscan_clustering(feature_vector, original_shape)
+        result_image_path = dbscan_clustering(
+        feature_vector_transformed, original_shape, scaler, result_folder, use_pca=use_pca, pca=pca
+    )
+
     elif algorithm == 'birch':
         result_image_path = birch_clustering(
-            feature_vector_transformed, original_shape, scaler, result_folder,
-            use_pca=use_pca, pca=pca, n_clusters=5
+            feature_vector_transformed, original_shape, scaler, result_folder, use_pca=use_pca, pca=pca, n_clusters=5
         )
     elif algorithm == 'ward':
-        result_image_path = ward_clustering(feature_vector, original_shape, n_clusters=5)
+        result_image_path = ward_clustering(
+            image, scaler, result_folder, use_pca=use_pca, pca=pca, n_clusters=5
+        )
     else:
         flash('Invalid algorithm selected')
         return redirect(url_for('algorithm_selection', filename=filename))
 
     return render_template(
-    'results.html',
-    original_image=filename,
-    result_image=os.path.basename(result_image_path),
-    algorithm=algorithm
+        'results.html',
+        original_image=filename,
+        result_image=os.path.basename(result_image_path),
+        algorithm=algorithm
     )
-
 
 
 
