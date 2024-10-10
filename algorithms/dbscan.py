@@ -5,11 +5,9 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
 
 def dbscan_clustering(feature_vector, original_shape, scaler, result_folder, use_pca=False, pca=None):
-    # Use the constants
     eps = 0.1
     min_samples = 22
     max_dimension = 300
-    # original_shape is the shape of the original image
     original_height, original_width = original_shape[:2]
 
     # Determine the scaling factor
@@ -26,8 +24,7 @@ def dbscan_clustering(feature_vector, original_shape, scaler, result_folder, use
         print("Image size is within the limit; no resizing applied.")
 
     # Reshape the feature vector back to image dimensions to handle resizing
-    # This is necessary because we need to resize the image before clustering
-    # and adjust the feature vector accordingly
+    # This is because we are rresizing the picture
     feature_vector_image = feature_vector.reshape((original_height, original_width, -1))
 
     # Resize the feature vector image
@@ -35,29 +32,26 @@ def dbscan_clustering(feature_vector, original_shape, scaler, result_folder, use
     num_channels = feature_vector_image.shape[2]
     resized_feature_vector_image = np.zeros((new_height, new_width, num_channels), dtype=feature_vector_image.dtype)
 
-    # Resize each channel individually
     for i in range(num_channels):
         channel = feature_vector_image[:, :, i]
         resized_channel = cv2.resize(channel, (new_width, new_height), interpolation=cv2.INTER_AREA)
         resized_feature_vector_image[:, :, i] = resized_channel
 
-    # Flatten the resized feature vector image back to (num_pixels, features)
     resized_feature_vector = resized_feature_vector_image.reshape((-1, feature_vector.shape[1]))
 
-    # Now apply DBSCAN clustering on the resized feature vector
     print("Applying DBSCAN clustering...")
     dbscan = DBSCAN(eps=eps, min_samples=min_samples, metric='euclidean', n_jobs=-1)
     labels = dbscan.fit_predict(resized_feature_vector)
     unique_labels = np.unique(labels)
 
-    # Handle the case where all points are considered noise
+    # Error handling if all points are noiise
     if len(unique_labels) <= 1 and unique_labels[0] == -1:
         print("DBSCAN found no clusters.")
         # Create a black image to represent no clusters found
         segmented_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
     else:
         if use_pca:
-            # Since PCA was applied and we cannot inverse transform, assign random colors to clusters
+            # Assigning random colours to clusters
             unique_labels = unique_labels[unique_labels >= 0]
             colors = [np.random.randint(0, 255, size=3) for _ in unique_labels]
             colors = np.array(colors, dtype='uint8')
