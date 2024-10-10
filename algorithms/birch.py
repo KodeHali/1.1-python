@@ -6,11 +6,6 @@ from sklearn.cluster import Birch
 from sklearn.preprocessing import StandardScaler
 
 def birch_clustering(feature_vector, original_shape, scaler, result_folder, use_pca=False, pca=None, n_clusters=5, threshold=0.5, branching_factor=50):
-    from sklearn.cluster import Birch
-    import numpy as np
-    import os
-    import matplotlib.pyplot as plt
-
     # Apply BIRCH Clustering
     print("Applying BIRCH clustering...")
     birch = Birch(n_clusters=n_clusters, threshold=threshold, branching_factor=branching_factor)
@@ -34,7 +29,10 @@ def birch_clustering(feature_vector, original_shape, scaler, result_folder, use_
     segmented_image = segmented_image.reshape(original_shape)
 
     # Save the result
-    result_image_path = os.path.join(result_folder, 'result_birch.png')
+    if use_pca:
+        result_image_path = os.path.join(result_folder, 'result_birch_pca.png')
+    else:
+        result_image_path = os.path.join(result_folder, 'result_birch.png')
     plt.imsave(result_image_path, segmented_image)
 
     return result_image_path

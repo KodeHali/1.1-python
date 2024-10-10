@@ -86,7 +86,10 @@ def ward_clustering(image, scaler, result_folder, use_pca=False, pca=None, n_clu
     segmented_image = segmented_image.reshape(original_shape)
 
     # Save the result
-    result_image_path = os.path.join(result_folder, 'result_ward.png')
+    if use_pca:
+        result_image_path = os.path.join(result_folder, 'result_ward_pca.png')
+    else:
+        result_image_path = os.path.join(result_folder, 'result_ward.png')
     plt.imsave(result_image_path, segmented_image)
 
     return result_image_path

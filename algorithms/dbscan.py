@@ -6,8 +6,8 @@ from sklearn.cluster import DBSCAN
 
 def dbscan_clustering(feature_vector, original_shape, scaler, result_folder, use_pca=False, pca=None):
     # Use the constants
-    eps = 0.05
-    min_samples = 5
+    eps = 0.1
+    min_samples = 22
     max_dimension = 300
     # original_shape is the shape of the original image
     original_height, original_width = original_shape[:2]
@@ -92,7 +92,10 @@ def dbscan_clustering(feature_vector, original_shape, scaler, result_folder, use
     segmented_image_full_size = cv2.resize(segmented_image, (original_width, original_height), interpolation=cv2.INTER_NEAREST)
 
     # Save the result
-    result_image_path = os.path.join(result_folder, 'result_dbscan_' + os.path.basename('result.png'))
+    if use_pca:
+        result_image_path = os.path.join(result_folder, 'result_dbscan_pca' + os.path.basename('result.png'))
+    else:
+        result_image_path = os.path.join(result_folder, 'result_dbscan' + os.path.basename('result.png'))
     plt.imsave(result_image_path, segmented_image_full_size)
 
     return result_image_path
