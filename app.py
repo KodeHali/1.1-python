@@ -10,6 +10,7 @@ from algorithms.birch import birch_clustering  # Import the BIRCH clustering fun
 from algorithms.ward import ward_clustering  # Import the Ward's method clustering function
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from flask import send_from_directory
 
 
 
@@ -25,6 +26,11 @@ for folder in [app.config['UPLOAD_FOLDER'], app.config['RESULT_FOLDER']]:
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+# Route to serve files from the uploads folder
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)   
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -131,7 +137,7 @@ def results():
         )
     elif algorithm == 'ward':
         result_image_path = ward_clustering(
-            image, scaler, result_folder, use_pca=use_pca, pca=pca, n_clusters=5
+            image, scaler, result_folder, use_pca=use_pca, pca=pca, n_clusters=20
         )
     else:
         flash('Invalid algorithm selected')
